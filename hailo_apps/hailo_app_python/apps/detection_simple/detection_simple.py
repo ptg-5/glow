@@ -44,6 +44,8 @@ def app_callback(pad, info, user_data):
         string_to_print += (
             f"Detection: {detection.get_label()} Confidence: {detection.get_confidence():.2f}\n"
         )
+        # detection에 뭐가 있는지 다 보고 싶으면?
+        hailo_logger.info(f"Detection get_class_id: {detection.get_class_id()}")
         hailo_logger.info(string_to_print)  # Log the detections
     print(string_to_print)
     return Gst.PadProbeReturn.OK

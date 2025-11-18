@@ -31,6 +31,7 @@ from hailo_apps.hailo_app_python.core.gstreamer.gstreamer_helper_pipelines impor
     INFERENCE_PIPELINE,
     SOURCE_PIPELINE,
     USER_CALLBACK_PIPELINE,
+    CROPPER_PIPELINE
 )
 
 hailo_logger = get_logger(__name__)
@@ -45,6 +46,10 @@ hailo_logger = get_logger(__name__)
 # This class inherits from the hailo_rpi_common.GStreamerApp class
 class GStreamerDetectionApp(GStreamerApp):
     def __init__(self, app_callback, user_data, parser=None):
+
+
+
+
         if parser is None:
             parser = get_default_parser()
         parser.add_argument(
@@ -93,6 +98,11 @@ class GStreamerDetectionApp(GStreamerApp):
                 pipeline_name=SIMPLE_DETECTION_PIPELINE,
                 resource_type=RESOURCES_MODELS_DIR_NAME,
             )
+        
+        self.hef_path = "/home/intelai/hailo/best_yolov8_cdh.hef"
+        self.hef_path_skin = "/home/intelai/hailo/mobile_net_han_kernel_shape.hef"
+        self.post_process_so_skin = "/home/intelai/hailo/hailo-apps-infra/skin_post/build/libskin_post.so"
+        self.post_function_name_skin = "skin_regression"
 
         hailo_logger.info(f"Using HEF path: {self.hef_path}")
 
@@ -106,7 +116,9 @@ class GStreamerDetectionApp(GStreamerApp):
         self.post_function_name = SIMPLE_DETECTION_POSTPROCESS_FUNCTION
 
         # User-defined label JSON file
-        self.labels_json = self.options_menu.labels_json
+        # self.labels_json = self.options_menu.labels_json
+        self.labels_json = "/home/intelai/hailo/hailo-apps-infra/resources/json/cdh_labels.json"
+        print(f"labels_json: {self.labels_json}<<<<<<<,,,")
 
         self.app_callback = app_callback
 
@@ -124,9 +136,73 @@ class GStreamerDetectionApp(GStreamerApp):
         self.create_pipeline()
 
     def get_pipeline_string(self):
+        self.video_source = "/dev/video0"
         source_pipeline = SOURCE_PIPELINE(
             video_source=self.video_source,
             video_width=self.video_width,
+            video_height=self.video_height,
+            frame_rate=30,
+            sync=False,
+            no_webcam_compression=True,
+        )
+
+        yolo_detection = INFERENCE_PIPELINE(
+            hef_path=self.hef_path,
+            post_process_so=self.post_process_so,
+            post_function_name=self.post_function_name,
+            batch_size=self.batch_size,
+            config_json=self.labels_json,
+            additional_params=f"{self.thresholds_str} vdevice-group-id=1",
+        )
+
+        skin_analysis = (
+            f"hailonet hef-path={self.hef_path_skin} "
+            f"batch-size=1 vdevice-group-id=1 ! "
+            f"queue ! "
+            f"hailofilter so-path={self.post_process_so_skin} "
+            f"function-name=skin_regression qos=false ! "
+            f"queue"
+        )
+
+        # 기본 whole_buffer 크롭 사용
+        from hailo_apps.hailo_app_python.core.common.defines import (
+            TAPPAS_POSTPROC_PATH_DEFAULT,
+            TAPPAS_POSTPROC_PATH_KEY,
+        )
+        
+        tappas_dir = os.environ.get(TAPPAS_POSTPROC_PATH_KEY, TAPPAS_POSTPROC_PATH_DEFAULT)
+        whole_buffer_so = os.path.join(tappas_dir, "cropping_algorithms/libwhole_buffer.so")
+
+        cropper_wrapper = CROPPER_PIPELINE(
+            inner_pipeline=skin_analysis,
+            so_path=whole_buffer_so,           # ← 기본 크롭 .so
+            # so_path=self.post_process_so_skin,           # ← 기본 크롭 .so
+            function_name="create_crops",       # ← 기본 크롭 함수
+            use_letterbox=True,
+            no_scaling_bbox=True,
+            internal_offset=True,
+            resize_method="bilinear",
+        )
+
+        display_pipeline = DISPLAY_PIPELINE(
+            video_sink="ximagesink", sync=False, show_fps=True
+        )
+
+        pipeline_string = (
+            f"{source_pipeline} ! "
+            f"{yolo_detection} ! "
+            f"{cropper_wrapper} ! "
+            f"{USER_CALLBACK_PIPELINE()} ! "
+            f"{display_pipeline}"
+        )
+
+        hailo_logger.info(f"Pipeline:\n{pipeline_string}")
+        return pipeline_string
+
+    def get_pipeline_string_backup(self):
+        source_pipeline = SOURCE_PIPELINE(
+                video_source=self.video_source,
+                video_width=self.video_width,
             video_height=self.video_height,
             frame_rate=self.frame_rate,
             sync=self.sync,
@@ -142,6 +218,7 @@ class GStreamerDetectionApp(GStreamerApp):
             additional_params=self.thresholds_str,
         )
         user_callback_pipeline = USER_CALLBACK_PIPELINE()
+        
         display_pipeline = DISPLAY_PIPELINE(
             video_sink=self.video_sink, sync=self.sync, show_fps=self.show_fps
         )
@@ -152,6 +229,7 @@ class GStreamerDetectionApp(GStreamerApp):
             f"{user_callback_pipeline} ! "
             f"{display_pipeline}"
         )
+
         hailo_logger.info(f"Pipeline string: {pipeline_string}")
         return pipeline_string
 

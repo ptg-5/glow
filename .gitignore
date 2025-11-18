@@ -17,6 +17,7 @@ resources/*.mp4
 *.egg-info/
 
 # Build, cache, and coverage files
+build
 build/
 build.release/
 dist/
@@ -38,3 +39,8 @@ venv_hailo_apps/
 
 resources/
 resources
+
+
+
+.vscode/
+

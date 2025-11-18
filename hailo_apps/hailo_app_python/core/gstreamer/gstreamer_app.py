@@ -118,7 +118,7 @@ def dummy_callback(pad, info, user_data):
 # -----------------------------------------------------------------------------------------------
 class GStreamerApp:
     def __init__(self, args, user_data: app_callback_class):
-        hailo_logger.debug("Initializing GStreamerApp")
+        hailo_logger.debug("Initializing GStreamAerApp")
         setproctitle.setproctitle("Hailo Python App")
 
         self.options_menu = args.parse_args()
@@ -163,6 +163,7 @@ class GStreamerApp:
                 hailo_logger.debug(f"Using USB camera: {self.video_source[0]}")
                 self.video_source = self.video_source[0]
 
+        hailo_logger.info(f"self.video_source :{self.video_source}")
         self.source_type = get_source_type(self.video_source)
         hailo_logger.debug(f"Source type determined: {self.source_type}")
 
