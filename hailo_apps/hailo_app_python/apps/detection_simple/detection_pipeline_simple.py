@@ -47,9 +47,6 @@ hailo_logger = get_logger(__name__)
 class GStreamerDetectionApp(GStreamerApp):
     def __init__(self, app_callback, user_data, parser=None):
 
-
-
-
         if parser is None:
             parser = get_default_parser()
         parser.add_argument(
@@ -78,7 +75,7 @@ class GStreamerDetectionApp(GStreamerApp):
                 model=SIMPLE_DETECTION_VIDEO_NAME,
             )
         # Determine the architecture if not specified
-        if self.options_menu.arch is None:    
+        if self.options_menu.arch is None:
             arch = os.getenv(HAILO_ARCH_KEY, detect_hailo_arch())
             if not arch:
                 hailo_logger.error("Could not detect Hailo architecture.")
@@ -86,7 +83,8 @@ class GStreamerDetectionApp(GStreamerApp):
                     "Could not auto-detect Hailo architecture. Please specify --arch manually."
                 )
             self.arch = arch
-            hailo_logger.debug(f"Auto-detected Hailo architecture: {self.arch}")
+            hailo_logger.debug(
+                f"Auto-detected Hailo architecture: {self.arch}")
         else:
             self.arch = self.options_menu.arch
             hailo_logger.debug("Using user-specified arch: %s", self.arch)
@@ -98,7 +96,7 @@ class GStreamerDetectionApp(GStreamerApp):
                 pipeline_name=SIMPLE_DETECTION_PIPELINE,
                 resource_type=RESOURCES_MODELS_DIR_NAME,
             )
-        
+
         self.hef_path = "/home/intelai/hailo/best_yolov8_cdh.hef"
         self.hef_path_skin = "/home/intelai/hailo/mobile_net_han_kernel_shape.hef"
         self.post_process_so_skin = "/home/intelai/hailo/hailo-apps-infra/skin_post/build/libskin_post.so"
@@ -111,7 +109,8 @@ class GStreamerDetectionApp(GStreamerApp):
             resource_type=RESOURCES_SO_DIR_NAME,
             model=SIMPLE_DETECTION_POSTPROCESS_SO_FILENAME,
         )
-        hailo_logger.info(f"Using post-process shared object: {self.post_process_so}")
+        hailo_logger.info(
+            f"Using post-process shared object: {self.post_process_so}")
 
         self.post_function_name = SIMPLE_DETECTION_POSTPROCESS_FUNCTION
 
@@ -163,15 +162,18 @@ class GStreamerDetectionApp(GStreamerApp):
             f"function-name=skin_regression qos=false ! "
             f"queue"
         )
+        
 
         # 기본 whole_buffer 크롭 사용
         from hailo_apps.hailo_app_python.core.common.defines import (
             TAPPAS_POSTPROC_PATH_DEFAULT,
             TAPPAS_POSTPROC_PATH_KEY,
         )
-        
-        tappas_dir = os.environ.get(TAPPAS_POSTPROC_PATH_KEY, TAPPAS_POSTPROC_PATH_DEFAULT)
-        whole_buffer_so = os.path.join(tappas_dir, "cropping_algorithms/libwhole_buffer.so")
+
+        tappas_dir = os.environ.get(
+            TAPPAS_POSTPROC_PATH_KEY, TAPPAS_POSTPROC_PATH_DEFAULT)
+        whole_buffer_so = os.path.join(
+            tappas_dir, "cropping_algorithms/libwhole_buffer.so")
 
         cropper_wrapper = CROPPER_PIPELINE(
             inner_pipeline=skin_analysis,
@@ -180,8 +182,9 @@ class GStreamerDetectionApp(GStreamerApp):
             function_name="create_crops",       # ← 기본 크롭 함수
             use_letterbox=True,
             no_scaling_bbox=True,
-            internal_offset=True,
+            internal_offset=False,
             resize_method="bilinear",
+
         )
 
         display_pipeline = DISPLAY_PIPELINE(
@@ -201,8 +204,8 @@ class GStreamerDetectionApp(GStreamerApp):
 
     def get_pipeline_string_backup(self):
         source_pipeline = SOURCE_PIPELINE(
-                video_source=self.video_source,
-                video_width=self.video_width,
+            video_source=self.video_source,
+            video_width=self.video_width,
             video_height=self.video_height,
             frame_rate=self.frame_rate,
             sync=self.sync,
@@ -218,7 +221,7 @@ class GStreamerDetectionApp(GStreamerApp):
             additional_params=self.thresholds_str,
         )
         user_callback_pipeline = USER_CALLBACK_PIPELINE()
-        
+
         display_pipeline = DISPLAY_PIPELINE(
             video_sink=self.video_sink, sync=self.sync, show_fps=self.show_fps
         )
