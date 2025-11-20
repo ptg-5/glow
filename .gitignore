@@ -16,6 +16,7 @@ resources/*.mp4
 # Packages and dependencies
 *.egg-info/
 
+
 # Build, cache, and coverage files
 build
 build/
@@ -44,3 +45,5 @@ resources
 
 .vscode/
 
+
+*.dot

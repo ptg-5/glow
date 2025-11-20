@@ -32,7 +32,7 @@ class user_app_callback_class(app_callback_class):
 def app_callback(pad, info, user_data):
     user_data.increment()  # Using the user_data to count the number of frames
     frame_idx = user_data.get_count()
-    hailo_logger.debug("Processing frame %s", frame_idx)  # Log the frame index being processed
+    # hailo_logger.debug("Processing frame %s", frame_idx)  # Log the frame index being processed
     string_to_print = f"Frame count: {user_data.get_count()}\n"
     buffer = info.get_buffer()  # Get the GstBuffer from the probe info
     if buffer is None:  # Check if the buffer is valid
@@ -45,9 +45,16 @@ def app_callback(pad, info, user_data):
             f"Detection: {detection.get_label()} Confidence: {detection.get_confidence():.2f}\n"
         )
         # detection에 뭐가 있는지 다 보고 싶으면?
-        hailo_logger.info(f"Detection get_class_id: {detection.get_class_id()}")
-        hailo_logger.info(string_to_print)  # Log the detections
-    print(string_to_print)
+        # hailo_logger.info(f"Detection get_class_id: {detection.get_class_id()}")
+        # hailo_logger.info(string_to_print)  # Log the detections
+        classifications = detection.get_objects_typed(hailo.HAILO_CLASSIFICATION)
+        if len(classifications) > 0:
+            for classification in classifications:
+                if classification.get_label() == 'Unknown':
+                    string_to_print += 'Unknown person detected'
+                else:
+                    string_to_print += f'Person recognition: {classification.get_label()} (Confidence: {classification.get_confidence():.1f})'
+    # print(string_to_print)
     return Gst.PadProbeReturn.OK
 
 

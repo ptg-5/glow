@@ -63,6 +63,10 @@ std::vector<HailoROIPtr> all_detections(std::shared_ptr<HailoMat> image, HailoRO
 
     // Get all detections.
     std::vector<HailoDetectionPtr> detections_ptrs = hailo_common::get_hailo_detections(roi);
+    printf("all_detections.detections.size : %zu",detections_ptrs.size());
+    for(auto d_p:detections_ptrs){
+        printf("d_p->get_label: %s\n",d_p->get_label());
+    }
 
     // Increment the age of all tracks
     for (auto &entry : track_ages) {
@@ -87,6 +91,7 @@ std::vector<HailoROIPtr> all_detections(std::shared_ptr<HailoMat> image, HailoRO
         if (!box_contains_nan(detection->get_bbox()))
         {
             crop_rois.emplace_back(detection);
+            printf("all_detections.detection.get_label() : %s",detection->get_label());
 
             // Reset the age of the processed track
             auto tracking_obj = get_tracking_id(detection);
