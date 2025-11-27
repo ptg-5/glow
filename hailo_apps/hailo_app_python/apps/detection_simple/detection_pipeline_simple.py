@@ -138,6 +138,8 @@ class GStreamerDetectionApp(GStreamerApp):
 
     def get_pipeline_string(self):
         self.video_source = "/dev/video0"
+        # test 
+        # self.video_source = "/home/intelai/123456.mp4"
         source_pipeline = SOURCE_PIPELINE(
             video_source=self.video_source,
             video_width=self.video_width,
