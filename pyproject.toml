@@ -42,6 +42,7 @@ hailo-tiling =              "hailo_apps.hailo_app_python.apps.tiling.tiling:main
 hailo-multisource =         "hailo_apps.hailo_app_python.apps.multisource.multisource:main"
 hailo-reid =                "hailo_apps.hailo_app_python.apps.reid_multisource.reid_multisource:main"
 hailo-resnet =              "hailo_apps.hailo_app_python.apps.detection_simple.cls_resnet:main"
+hailo-yolo-cls =            "hailo_apps.hailo_app_python.apps.detection_simple.cls_yolo8:main"
 
 [tool.setuptools.packages.find]
 include = ["hailo_apps*"]

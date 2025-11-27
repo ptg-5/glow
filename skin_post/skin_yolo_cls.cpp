@@ -8,7 +8,7 @@
 #include "skin_util.hpp"
 
 // ========== FILTER 함수 ==========
-extern "C" hailo_status resnet_cls(HailoROIPtr roi)
+extern "C" hailo_status yolov8_cls(HailoROIPtr roi)
 {
     try
     {
@@ -17,7 +17,7 @@ extern "C" hailo_status resnet_cls(HailoROIPtr roi)
         HailoTensorPtr tensor;
         try {
 
-            tensor = roi->get_tensor("resnet50_downsample_bias_removed/dense_conv54");
+            tensor = roi->get_tensor("yolov8_cls_han/softmax1");
 
 
         } catch (...) {
@@ -59,7 +59,8 @@ extern "C" hailo_status resnet_cls(HailoROIPtr roi)
         
         // ---------- 실제 확률 변환 부분 시작 ----------
         // 텐서의 출력이 3개라고 가정하고, 레이블을 3개로 설정합니다.
-        std::vector<std::string> labels = {"dry", "normal", "oily"};
+        std::vector<std::string> labels = {"acne", "atopy", "normal", "psoriasis", "rosacea", "seborrheic"};
+
         const size_t MAX_OUTPUTS = labels.size(); // 레이블 수에 맞춰 출력 개수 설정
 
         if (tensor_size < MAX_OUTPUTS) {
@@ -108,6 +109,7 @@ extern "C" hailo_status resnet_cls(HailoROIPtr roi)
             result += labels[i] + ":" + std::to_string((int)std::round(val_percent)) + "%";
             printf("%s: %d%% ", labels[i].c_str(), (int)std::round(val_percent));
         }
+
         printf("\n(Total Sum: %.1f%%)\n", sum_check);
         printf("======== Probabilities end ==========\n");
         
