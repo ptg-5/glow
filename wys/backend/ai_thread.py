@@ -85,7 +85,8 @@ class HailoWorker(QThread):
                 self.pipeline = None
                 self.appsink = None
 
-                gc.collect()
+                # segmentation fault 발생에 기여
+                # gc.collect()
                 print("   - [Cleanup] 완료")
         except Exception as e:
             print(f"   - [Error] Stop 중 에러: {e}")

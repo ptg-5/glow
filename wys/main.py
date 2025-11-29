@@ -1,6 +1,7 @@
 import sys
 import os
 
+# os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = "/usr/lib/aarch64-linux-gnu/qt5/plugins"
 os.environ["QT_PLUGIN_PATH"] = "/usr/lib/aarch64-linux-gnu/qt5/plugins"
 os.environ["QT_IM_MODULE"] = "fcitx"
 os.environ["GTK_IM_MODULE"] = "fcitx"
