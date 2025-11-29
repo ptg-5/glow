@@ -11,7 +11,9 @@ include_directories(/usr/include/hailo/tappas)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 # 라이브러리 (libhailo_common.so는 없어도 됨 → libhailort.so에 다 들어있음)
-add_library(skin_post SHARED skin_util.cpp skin_regression.cpp skin_resnet.cpp skin_yolo_cls.cpp)
+add_library(skin_post SHARED  
+# skin_util.cpp 
+skin_regression.cpp skin_resnet.cpp skin_yolo_cls.cpp)
 # add_library(skin_post SHARED skin_resnet.cpp)
 
 target_link_libraries(skin_post
