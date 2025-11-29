@@ -47,3 +47,14 @@ resources
 
 
 *.dot
+
+
+core
+
+*.db
+
+*.pt
+
+*.csv
+
+*.swp
