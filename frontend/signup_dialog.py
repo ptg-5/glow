@@ -25,6 +25,8 @@ class SignupDialog(QDialog):
                 font-weight: bold;
                 font-family: 'NanumGothic', 'Malgun Gothic', sans-serif; /* 한글 폰트 지정 */
                 margin-top: 10px;
+                padding: 0px;
+                border:0px;
             }
             QLineEdit { 
                 background-color: #333; 
@@ -46,7 +48,7 @@ class SignupDialog(QDialog):
                 font-weight: bold; 
                 border-radius: 10px; 
                 font-size: 18px; 
-                padding: 15px; /* 버튼도 키움 */
+                padding: 0px; /* 버튼도 키움 */
                 margin-top: 20px;
                 font-family: 'NanumGothic', sans-serif;
             }
@@ -64,8 +66,10 @@ class SignupDialog(QDialog):
         layout.setContentsMargins(40, 50, 40, 50) # 전체 여백 확보
         layout.setSpacing(5)
 
+
         # 타이틀
         lbl_title = QLabel("✨ 새 계정 만들기")
+        lbl_title.setMinimumHeight(80)
         lbl_title.setAlignment(Qt.AlignCenter)
         lbl_title.setStyleSheet("color: #D4AF37; font-size: 28px; font-weight: bold; margin-bottom: 30px; border: none;")
         layout.addWidget(lbl_title)
@@ -75,18 +79,22 @@ class SignupDialog(QDialog):
         layout.addWidget(QLabel("이름"))
         self.input_name = QLineEdit()
         self.input_name.setPlaceholderText("이름을 입력하세요")
+        self.input_name.setMinimumHeight(60)
+        # self.input_name.setFont(font)
         layout.addWidget(self.input_name)
         
         # 아이디
         layout.addWidget(QLabel("아이디"))
         self.input_id = QLineEdit()
         self.input_id.setPlaceholderText("아이디 (영문/숫자)")
+        self.input_id.setMinimumHeight(60)
         layout.addWidget(self.input_id)
         
         # 비밀번호
         layout.addWidget(QLabel("비밀번호"))
         self.input_pw = QLineEdit()
         self.input_pw.setPlaceholderText("비밀번호 (4자리 이상)")
+        self.input_pw.setMinimumHeight(60)
         self.input_pw.setEchoMode(QLineEdit.Password)
         layout.addWidget(self.input_pw)
         
@@ -94,6 +102,7 @@ class SignupDialog(QDialog):
         layout.addWidget(QLabel("비밀번호 확인"))
         self.input_pw_confirm = QLineEdit()
         self.input_pw_confirm.setPlaceholderText("비밀번호를 다시 입력하세요")
+        self.input_pw_confirm.setMinimumHeight(60)
         self.input_pw_confirm.setEchoMode(QLineEdit.Password)
         layout.addWidget(self.input_pw_confirm)
 
@@ -101,11 +110,13 @@ class SignupDialog(QDialog):
 
         # 버튼
         btn_signup = QPushButton("가입하기")
+        btn_signup.setMinimumHeight(50)
         btn_signup.setCursor(Qt.PointingHandCursor)
         btn_signup.clicked.connect(self.try_signup)
         layout.addWidget(btn_signup)
         
         btn_cancel = QPushButton("취소")
+        btn_cancel.setMinimumHeight(50)
         btn_cancel.setObjectName("CancelBtn")
         btn_cancel.setCursor(Qt.PointingHandCursor)
         btn_cancel.clicked.connect(self.reject)
@@ -150,8 +161,8 @@ class SignupDialog(QDialog):
         msg.setText(text)
         # 메시지 박스도 한글 폰트 적용
         msg.setStyleSheet("""
-            QMessageBox { background-color: white; }
-            QLabel { color: black; font-size: 14px; font-family: 'NanumGothic'; }
+            QMessageBox { background-color: #333; padding: 0px; border: 0px;}
+            QLabel { color: white; font-size: 14px; font-family: 'NanumGothic'; }
             QPushButton { background-color: #D4AF37; color: white; padding: 5px 15px; }
         """)
         msg.exec_()

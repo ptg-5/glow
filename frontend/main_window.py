@@ -13,6 +13,7 @@ from frontend.mirror import MirrorScreen
 from backend.voice_thread import VoiceWorker
 from sensors.manager import SensorWorker 
 from backend.database import DBManager
+import time
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -20,7 +21,8 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("GLOWFOREVER - AI Smart Mirror")
         self.setGeometry(100, 100, 1280, 800)
         self.setStyleSheet(STYLESHEET)
-        
+        self.last_save_time = 0
+
         main_widget = QWidget()
         main_widget.setObjectName("MainBackground")
         main_widget.setStyleSheet("background-color: #000000;")
@@ -34,9 +36,14 @@ class MainWindow(QMainWindow):
         self.header_frame = QFrame()
         self.header_frame.setObjectName("HeaderBar")
         self.header_frame.setFixedHeight(60)
-        self.header_frame.setStyleSheet("background-color: rgba(20, 20, 20, 0.8); border-bottom: 1px solid #333;")
+        #self.header_frame.setStyleSheet(
+        #    "background-color: rgba(20, 20, 20, 0.8); border-bottom: 1px solid #333;")
+        self.header_frame.setStyleSheet(
+            "background-color: rgba(20, 20, 20, 0.4); border: none;"
+        )
+
         h_layout = QHBoxLayout(self.header_frame)
-        
+
         lbl_logo = QLabel("GLOWFOREVER")
         lbl_logo.setObjectName("HeaderLogo")
         self.lbl_datetime = QLabel("Loading...")
@@ -54,21 +61,25 @@ class MainWindow(QMainWindow):
         h_layout.addStretch()
         h_layout.addWidget(self.lbl_datetime)
         h_layout.addSpacing(20)
-        h_layout.addWidget(self.lbl_temp)
-        h_layout.addWidget(self.lbl_hum)
-        
+        h_layout.addWidget(self.lbl_temp)  # 온도
+        h_layout.addWidget(self.lbl_hum)  # 습도
+
         main_layout.addWidget(self.header_frame)
-        
+
         # --- Content ---
         content_box = QHBoxLayout()
         content_box.setSpacing(0)
-        
+
         # Sidebar
         self.side_nav = QFrame()
         self.side_nav.setObjectName("SideNav")
-        self.side_nav.setStyleSheet("background-color: rgba(20, 20, 20, 0.8); border-right: 1px solid #333;")
+        #self.side_nav.setStyleSheet(
+        #    "background-color: rgba(20, 20, 20, 0.8); border-right: 1px solid #333;")
+        self.side_nav.setStyleSheet(
+            "background-color: rgba(20, 20, 20, 0.3); border: none;"
+        )
         nav_layout = QVBoxLayout(self.side_nav)
-        
+
         self.btn_home = QPushButton("🏠\nHome")
         self.btn_report = QPushButton("📋\nReport")
         self.btn_color = QPushButton("🎨\nColor")
@@ -403,6 +414,7 @@ class MainWindow(QMainWindow):
             # [중요] DB 저장 (여기서만!)
             try:
                 db = DBManager()
+                print(f"MainWindow.show_analysis_result >>, current_user :{self.current_user}")
                 db.insert_skin_record(score, details, user_id=self.current_user['id'])
                 db.close()
                 print("💾 [UI] DB 저장 완료")
