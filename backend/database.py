@@ -74,6 +74,21 @@ class DBManager:
     def insert_skin_record(self, summary_score, detail_data, user_id=0):
         # user_id=0 은 비회원(Guest)으로 간주
         json_str = json.dumps(detail_data, ensure_ascii=False)
+        # self.conn.execute("""
+        #     CREATE TABLE IF NOT EXISTS skin_records (
+        #         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        #         user_id INTEGER,
+        #         timestamp DATETIME,
+        #         summary_score INTEGER,
+        #         detail_json TEXT,
+        #         memo TEXT,
+        #         FOREIGN KEY(user_id) REFERENCES users(id)
+        #     )
+        # """)
+        print("insert_skin_record>json_str>>",json_str)
+        print("insert_skin_record>summary_score>>",summary_score)
+        print("insert_skin_record>user_id>>",user_id)
+        
         self.conn.execute(
             "INSERT INTO skin_records (user_id, timestamp, summary_score, detail_json) VALUES (?, ?, ?, ?)",
             (user_id, datetime.now(), summary_score, json_str)

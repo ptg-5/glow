@@ -18,12 +18,21 @@ PART_MAP = {
 }
 
 # [지표 한글 변환]
+# METRIC_MAP = {
+#     "Dry": "건조", "Oil": "유분",
+#     "Acne": "트러블", "Wrinkle": "주름", "Pigment": "색소"
+# }
 METRIC_MAP = {
-    "Dry": "건조", "Oil": "유분", 
-    "Acne": "트러블", "Wrinkle": "주름", "Pigment": "색소"
+    "Dry": "건조(1~3)",
+    "Wrinkle": "주름(1~8)",
+    "Pigment": "색소(1~3)",
+    "Pore": "모공(1~3)",
+    "Sagging": "처짐(1~3)"
 }
 
 # --- 1. 그래프 위젯 ---
+
+
 class SkinGraphWidget(QWidget):
     def __init__(self, data_points):
         super().__init__()
@@ -82,18 +91,28 @@ class ProductCard(QFrame):
     def __init__(self, icon_name, name, desc):
         super().__init__()
         self.setFixedSize(140, 180)
-        self.setStyleSheet("background-color: #2A2A2A; border-radius: 10px; border: 1px solid #444;")
+        self.setStyleSheet(
+            "background-color: #2A2A2A; border-radius: 10px; border: 1px solid #444;")
         layout = QVBoxLayout(self)
         icon = qta.icon(icon_name, color="#D4AF37")
-        lbl_icon = QLabel(); lbl_icon.setPixmap(icon.pixmap(64, 64)); lbl_icon.setAlignment(Qt.AlignCenter)
-        lbl_name = QLabel(name); lbl_name.setWordWrap(True); 
-        lbl_name.setStyleSheet("color: white; font-weight: bold; font-size: 13px; border: none;")
+        lbl_icon = QLabel()
+        lbl_icon.setPixmap(icon.pixmap(64, 64))
+        lbl_icon.setAlignment(Qt.AlignCenter)
+        lbl_name = QLabel(name)
+        lbl_name.setWordWrap(True)
+        lbl_name.setStyleSheet(
+            "color: white; font-weight: bold; font-size: 13px; border: none;")
         lbl_name.setAlignment(Qt.AlignCenter)
-        lbl_desc = QLabel(desc); lbl_desc.setStyleSheet("color: #888; font-size: 11px; border: none;")
+        lbl_desc = QLabel(desc)
+        lbl_desc.setStyleSheet("color: #888; font-size: 11px; border: none;")
         lbl_desc.setAlignment(Qt.AlignCenter)
-        layout.addWidget(lbl_icon); layout.addWidget(lbl_name); layout.addWidget(lbl_desc)
+        layout.addWidget(lbl_icon)
+        layout.addWidget(lbl_name)
+        layout.addWidget(lbl_desc)
 
-# --- 3. [NEW] 수정 팝업 다이얼로그 ---
+# --- 3. [NEW] 수정 팝업 다이얼로그 (다크 테마) ---
+
+
 class EditRecordDialog(QDialog):
     def __init__(self, current_score, current_details, current_memo, parent=None):
         super().__init__(parent)
@@ -154,7 +173,9 @@ class EditRecordDialog(QDialog):
         self.input_widgets = {}
 
         if not current_details:
-            lbl_empty = QLabel("데이터가 없습니다."); lbl_empty.setAlignment(Qt.AlignCenter); lbl_empty.setStyleSheet("color: #666; padding: 20px;")
+            lbl_empty = QLabel("데이터가 없습니다.")
+            lbl_empty.setAlignment(Qt.AlignCenter)
+            lbl_empty.setStyleSheet("color: #666; padding: 20px;")
             self.form_layout.addWidget(lbl_empty)
         else:
             for part_key, metrics in current_details.items():
@@ -241,11 +262,11 @@ class ReportScreen(QWidget):
         if len(scores) < 2: scores = [0] + scores
         self.content_layout.addWidget(lbl_chart); self.content_layout.addWidget(SkinGraphWidget(scores))
 
-        lbl_rec = QLabel("🛍️ Recommended Products"); lbl_rec.setStyleSheet("color: #D4AF37; font-size: 18px; font-weight: bold; margin-top: 10px;")
-        prod_scroll = QScrollArea(); prod_scroll.setFixedHeight(210); prod_scroll.setStyleSheet("background: transparent; border: none;")
-        prod_content = QWidget(); prod_layout = QHBoxLayout(prod_content)
-        prod_layout.addWidget(ProductCard('fa5s.tint', 'Moisture Cream', 'Hydration')); prod_layout.addWidget(ProductCard('fa5s.sun', 'Sun Shield', 'Protection')); prod_layout.addWidget(ProductCard('fa5s.soap', 'Gentle Foam', 'Cleansing')); prod_layout.addStretch()
-        prod_scroll.setWidget(prod_content); self.content_layout.addWidget(lbl_rec); self.content_layout.addWidget(prod_scroll)
+        # lbl_rec = QLabel("🛍️ Recommended Products"); lbl_rec.setStyleSheet("color: #D4AF37; font-size: 18px; font-weight: bold; margin-top: 10px;")
+        # prod_scroll = QScrollArea(); prod_scroll.setFixedHeight(210); prod_scroll.setStyleSheet("background: transparent; border: none;")
+        # prod_content = QWidget(); prod_layout = QHBoxLayout(prod_content)
+        # prod_layout.addWidget(ProductCard('fa5s.tint', 'Moisture Cream', 'Hydration')); prod_layout.addWidget(ProductCard('fa5s.sun', 'Sun Shield', 'Protection')); prod_layout.addWidget(ProductCard('fa5s.soap', 'Gentle Foam', 'Cleansing')); prod_layout.addStretch()
+        # prod_scroll.setWidget(prod_content); self.content_layout.addWidget(lbl_rec); self.content_layout.addWidget(prod_scroll)
 
         lbl_hist = QLabel("📋 Recent History (Edit/Delete)"); lbl_hist.setStyleSheet("color: #D4AF37; font-size: 18px; font-weight: bold; margin-top: 10px;")
         self.content_layout.addWidget(lbl_hist)
