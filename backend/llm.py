@@ -52,6 +52,8 @@ class LLMResponseGenerator:
                     # CLI 확인용 (원하면 삭제 가능)
                     print(token, end="", flush=True)
                     # [중요] 한 글자씩 밖으로 던짐
+                    if "<|im_end|>" in token:
+                        break
                     yield token
                     
             print("\n✅ 응답 완료")
